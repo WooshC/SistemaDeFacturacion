@@ -1,11 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package vista;
 
-import Interfaz.MenuInteractionHandler;
-import Interfaz.MenuMouseAdapter;
+import Interfaz.LabelAdapter;
 import conexion.Login;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -16,26 +11,32 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import modUsuarios.Empleado;
+import vista.JFIngresar;
+import vista.JFInventario;
 
-/**
- *
- * @author USUARIO
- */
-public class JFMenu extends javax.swing.JFrame implements MenuInteractionHandler {
+public class JFMenu extends javax.swing.JFrame {
 
+    //Mouse
+    int xMouse, yMouse;
+    //Atributos
     private Connection connection;
     private String username;
     private Login login;
-
-    // Mouses
-    int xMouse, yMouse;
-    // Paneles:
+    private Empleado empleado;
     private JPanel[] clickedPanels = new JPanel[6];
-    CardLayout contenido;
+    private CardLayout contenido;
+    private JFrame activeForm = null;
 
     private JLabel activeMenu; // Para rastrear el menú activo
+
+    // Colores predefinidos
+    private static final Color DEFAULT_COLOR = Color.decode("#292728");
+    private static final Color HOVER_COLOR = Color.decode("#333333");
+    private static final Color CLICKED_COLOR = Color.decode("#494848");
 
     public JFMenu(String userRole, Connection connection, String username) {
         initComponents();
@@ -43,90 +44,131 @@ public class JFMenu extends javax.swing.JFrame implements MenuInteractionHandler
         this.connection = connection;
         this.username = username;
         this.login = new Login(connection);
-        
+
         setLocationRelativeTo(null);
-        
-        // Obtener el nombre y apellido del usuario
+        initializeUserDisplay();
+        initializePaneles();
+        initializeMenuListeners();
+        displayCurrentDate();
+    }
+
+    private JFMenu() {
+        initComponents();
+    }
+
+    // Inicializar visualización de usuario
+    private void initializeUserDisplay() {
         try {
             String[] nombreApellido = login.obtenerNombreApellido(username);
-            String displayText = String.format("Usuario: %s %s", nombreApellido[0], nombreApellido[1]);
-            txtID.setText(displayText);
+            txtID.setText(String.format("Usuario: %s %s", nombreApellido[0], nombreApellido[1]));
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al obtener los datos del usuario: " + e.getMessage());
         }
+    }
 
-        contenido = (CardLayout) (panelContent.getLayout());
+    // Inicializar paneles
+    private void initializePaneles() {
+        contenido = (CardLayout) panelContent.getLayout();
         contenido.show(panelContent, "card1");
-        
-        Color defaultColor = Color.decode("#292728");
-        Color hoverColor = Color.decode("#333333");
-        Color clickedColor = Color.decode("#494848");   
-        
-        // Aplicar el MouseAdapter a los JLabel del menú
-        menuInventario.addMouseListener(new MenuMouseAdapter(menuInventario, Clicked1, clickedPanels, defaultColor, hoverColor, clickedColor, this));
-        menuClientes.addMouseListener(new MenuMouseAdapter(menuClientes, Clicked2, clickedPanels, defaultColor, hoverColor, clickedColor, this));
-        menuProveedores.addMouseListener(new MenuMouseAdapter(menuProveedores, Clicked3, clickedPanels, defaultColor, hoverColor, clickedColor, this));
-        menuFacturacionYVenta.addMouseListener(new MenuMouseAdapter(menuFacturacionYVenta, Clicked4, clickedPanels, defaultColor, hoverColor, clickedColor, this));
-        menuAdministracion.addMouseListener(new MenuMouseAdapter(menuAdministracion, Clicked5, clickedPanels, defaultColor, hoverColor, clickedColor, this));
-        menuLogout.addMouseListener(new MenuMouseAdapter(menuLogout, Clicked6, clickedPanels, defaultColor, hoverColor, clickedColor, this, this::logoutAction));
-        
-        // Inicializar los paneles y hacerlos invisibles al inicio
+
         clickedPanels[0] = Clicked1;
         clickedPanels[1] = Clicked2;
         clickedPanels[2] = Clicked3;
         clickedPanels[3] = Clicked4;
         clickedPanels[4] = Clicked5;
         clickedPanels[5] = Clicked6;
-        
+
         for (JPanel panel : clickedPanels) {
             panel.setVisible(false);
         }
-        
-        setLocationRelativeTo(null);
+    }
+
+    // Configurar eventos de los menús
+    private void initializeMenuListeners() {
+        menuInventario.addMouseListener(new LabelAdapter(menuInventario, Clicked1, clickedPanels, DEFAULT_COLOR, HOVER_COLOR, CLICKED_COLOR, this::abrirInventario));
+        menuClientes.addMouseListener(new LabelAdapter(menuClientes, Clicked2, clickedPanels, DEFAULT_COLOR, HOVER_COLOR, CLICKED_COLOR));
+        menuProveedores.addMouseListener(new LabelAdapter(menuProveedores, Clicked3, clickedPanels, DEFAULT_COLOR, HOVER_COLOR, CLICKED_COLOR));
+        menuFacturacionYVenta.addMouseListener(new LabelAdapter(menuFacturacionYVenta, Clicked4, clickedPanels, DEFAULT_COLOR, HOVER_COLOR, CLICKED_COLOR));
+        menuAdministracion.addMouseListener(new LabelAdapter(menuAdministracion, Clicked5, clickedPanels, DEFAULT_COLOR, HOVER_COLOR, CLICKED_COLOR));
+        menuLogout.addMouseListener(new LabelAdapter(menuLogout, Clicked6, clickedPanels, DEFAULT_COLOR, HOVER_COLOR, CLICKED_COLOR, this::logoutAction));
+    }
+
+    // Mostrar la fecha actual
+    private void displayCurrentDate() {
         String fecha = "dd-MM-yyyy";
         Locale localM = null;
-        String resultado;
         Date fechaYHora = new Date();
-        resultado = mostrarFechaHora(fechaYHora, fecha, localM);
-        txtDateLog.setText("Fecha  : " + resultado);
+        txtDateLog.setText("Fecha  : " + mostrarFechaHora(fechaYHora, fecha, localM));
     }
 
-    private JFMenu() {
-        initComponents();
-    }
-    
-    @Override
-    public void setActiveMenu(JLabel activeMenu) {
-        if (this.activeMenu != null && !this.activeMenu.equals(activeMenu)) {
-            this.activeMenu.setBackground(Color.decode("#292728")); // Revertir el color del anterior
-        }
-        this.activeMenu = activeMenu;
-    }
-
+    // Método estático para mostrar la fecha y hora
     private static String mostrarFechaHora(Date fechaYHora, String formato, Locale local) {
-        String fechaString;
-        SimpleDateFormat formateador;
-        if (local == null) {
-            formateador = new SimpleDateFormat(formato);
-        } else {
-            formateador = new SimpleDateFormat(formato, local);
-        }
-
-        fechaString = formateador.format(fechaYHora);
-        return fechaString;
+        SimpleDateFormat formateador = local == null ? new SimpleDateFormat(formato) : new SimpleDateFormat(formato, local);
+        return formateador.format(fechaYHora);
     }
-    
+
+    // Acción de logout
     private void logoutAction() {
         getToolkit().beep();
         int dialogButton = JOptionPane.YES_NO_OPTION;
         int dialogResult = JOptionPane.showConfirmDialog(this, "¿Estás seguro/a que quieres salir de esta cuenta?", "Warning", dialogButton);
         if (dialogResult == JOptionPane.YES_OPTION) {
-            JFIngresar ingresarFrame = new JFIngresar(); // Crea una instancia del JFIngresar
-            ingresarFrame.setVisible(true); // Muestra el JFIngresar
-            dispose();    
+            JFIngresar ingresarFrame = new JFIngresar();
+            ingresarFrame.setVisible(true);
+            dispose();
+        } else {
+            resetMenu(menuLogout, Clicked6);
         }
     }
 
+    // Abrir formulario de inventario
+    private void abrirInventario() {
+        abrirFormHijo(new JFInventario());
+    }
+
+    // Abrir un formulario hijo en el panel contenedor
+     private void abrirFormHijo(JFrame formHijo) {
+
+        // Verifica si hay un formulario activo y ocúltalo si es necesario
+        if (activeForm != null) {
+            if (activeForm.getClass() == formHijo.getClass()) {
+                return;
+            }
+            activeForm.setVisible(false);
+        }
+
+        // Asigna el nuevo formulario activo
+        activeForm = formHijo;
+        // Configura el JFrame antes de hacerlo visible
+        // Esto debe hacerse antes de llamar a setVisible(true)
+        if (!formHijo.isUndecorated()) {
+            // Usa un Frame de configuración para configurar el JFrame
+            // Nota: Necesitamos un JFrame temporal para aplicar la configuración
+            JFrame tempFrame = new JFrame();
+            tempFrame.setUndecorated(true);
+            tempFrame.dispose(); // Destruye el marco temporal
+        }
+
+        // Ajusta el tamaño y la ubicación del formulario hijo
+        formHijo.setSize(JPGPanelContenedor.getSize());
+        formHijo.setLocation(JPGPanelContenedor.getLocation());
+        JPGPanelContenedor.setLayout(null);
+        // Configura el tamaño y la posición del formulario hijo antes de agregarlo
+        formHijo.setBounds(0, 0, JPGPanelContenedor.getWidth(), JPGPanelContenedor.getHeight());
+        // Añade el contenido al panel contenedor
+        JPGPanelContenedor.removeAll();
+
+        JPGPanelContenedor.add(formHijo.getContentPane());
+        JPGPanelContenedor.revalidate();
+        JPGPanelContenedor.repaint();
+
+    }
+
+    // Restablecer un menú al color y estado predeterminado
+    private void resetMenu(JLabel menuLabel, JPanel panel) {
+        menuLabel.setBackground(DEFAULT_COLOR);
+        panel.setVisible(false);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

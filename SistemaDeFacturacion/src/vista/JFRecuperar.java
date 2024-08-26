@@ -4,9 +4,10 @@
  */
 package vista;
 
-
+import Interfaz.ButtonAdapter;
 import conexion.ConexionBD;
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,30 +15,35 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author USUARIO
  */
-public class JFRecuperar extends javax.swing.JFrame {
 
+public class JFRecuperar extends javax.swing.JFrame {
     int xMouse, yMouse;
     ConexionBD conexionBD = new ConexionBD();
     Connection connect = conexionBD.getConexion();
 
-    /**
-     * Creates new form JFLogin
-     */
     public JFRecuperar() {
         initComponents();
-        setIconImage(new ImageIcon(getClass().getResource("/Iconos/AjustesBest.png")).getImage());
-        jCBPreguntaControl.setBackground(new Color(255,255,255));
+        Color defaultColor = new Color(255, 250, 243);
+        Color hoverColor = new Color(255, 51, 133);
+        // Crear la fábrica de MouseAdapters para los JButton
+        ButtonAdapter boton = new ButtonAdapter();
+        // Crear y asignar MouseAdapters a los botones usando la fábrica
+        jBIngresar.addMouseListener(boton.createMouseAdapter(jBIngresar, defaultColor, hoverColor));
+        jBRegresar.addMouseListener(boton.createMouseAdapter(jBRegresar, defaultColor, hoverColor));
+        setIconImage(new ImageIcon(getClass().getResource("/iconos/AjustesBest.png")).getImage());
+        jCBPreguntaControl.setBackground(new Color(255, 255, 255));
         this.setLocationRelativeTo(null);
         setTitle("Recuperar contraseña");
-        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     }
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -149,8 +155,8 @@ public class JFRecuperar extends javax.swing.JFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, -1));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/explosion.png"))); // NOI18N
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 510, 120));
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/gestionDePaquetes.png"))); // NOI18N
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, 120));
 
         jTFCedula.setFont(new java.awt.Font("Roboto Medium", 0, 12)); // NOI18N
         jTFCedula.setForeground(new java.awt.Color(204, 204, 204));
@@ -172,14 +178,6 @@ public class JFRecuperar extends javax.swing.JFrame {
         jBRegresar.setText("Regresar");
         jBRegresar.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jBRegresar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jBRegresar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jBRegresarMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jBRegresarMouseExited(evt);
-            }
-        });
         jBRegresar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBRegresarActionPerformed(evt);
@@ -194,14 +192,6 @@ public class JFRecuperar extends javax.swing.JFrame {
         jBIngresar.setText("Recuperar Contraseña");
         jBIngresar.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jBIngresar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jBIngresar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jBIngresarMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jBIngresarMouseExited(evt);
-            }
-        });
         jBIngresar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBIngresarActionPerformed(evt);
@@ -254,7 +244,7 @@ public class JFRecuperar extends javax.swing.JFrame {
         int numpregunta = preguntaToNumeroMap.getOrDefault(pregunta, 0);
         String respuesta = jTFRecuperar.getText();
         String CI = jTFCedula.getText();
-        recuperarContrasena(CI, numpregunta, respuesta);
+        //recuperarContrasena(CI, numpregunta, respuesta);
     }//GEN-LAST:event_jBIngresarActionPerformed
 
     private void jTFCedulaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTFCedulaMousePressed
@@ -295,59 +285,6 @@ public class JFRecuperar extends javax.swing.JFrame {
         xMouse = evt.getX();
         yMouse = evt.getY();
     }//GEN-LAST:event_jPanel2MousePressed
-
-    private void jBIngresarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBIngresarMouseEntered
-        jBIngresar.setBackground(new Color(255, 51, 133));
-    }//GEN-LAST:event_jBIngresarMouseEntered
-
-    private void jBIngresarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBIngresarMouseExited
-        jBIngresar.setBackground(new Color(255, 250, 243));
-    }//GEN-LAST:event_jBIngresarMouseExited
-
-    private void jBRegresarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBRegresarMouseEntered
-        jBRegresar.setBackground(new Color(255, 51, 133));
-    }//GEN-LAST:event_jBRegresarMouseEntered
-
-    private void jBRegresarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBRegresarMouseExited
-        jBRegresar.setBackground(new Color(255, 250, 243));
-    }//GEN-LAST:event_jBRegresarMouseExited
-    private void recuperarContrasena(String CI, int numpregunta, String respuesta) {
-        String sql = "SELECT passwordU, nombreUser FROM usuarios WHERE CI = ? AND numPregunta = ? AND respuesta = ?";
-        String updateSql = "UPDATE usuarios SET estado = 'Activado' WHERE CI = ? AND numPregunta = ? AND respuesta = ?";
-
-        try (PreparedStatement selectStatement = connect.prepareStatement(sql); PreparedStatement updateStatement = connect.prepareStatement(updateSql)) {
-
-            selectStatement.setString(1, CI);
-            selectStatement.setInt(2, numpregunta);
-            selectStatement.setString(3, respuesta);
-
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    String password = resultSet.getString("passwordU");
-                    String respuestaSeguridad = resultSet.getString("nombreUser");
-
-                    JOptionPane.showMessageDialog(null, "Tu contraseña es: " + password
-                            + "\nTu nombre de usuario es: " + respuestaSeguridad);
-
-                    updateStatement.setString(1, CI);
-                    updateStatement.setInt(2, numpregunta);
-                    updateStatement.setString(3, respuesta);
-
-                    int rowsUpdated = updateStatement.executeUpdate();
-                    if (rowsUpdated > 0) {
-                        // La actualización se realizó con éxito
-                    } else {
-                        // No se pudo actualizar el estado
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Credenciales o respuesta incorrecta");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Ocurrió un error en la base de datos");
-        }
-    }
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -401,4 +338,6 @@ public class JFRecuperar extends javax.swing.JFrame {
     private javax.swing.JTextField jTFCedula;
     private javax.swing.JTextField jTFRecuperar;
     // End of variables declaration//GEN-END:variables
+
+   
 }

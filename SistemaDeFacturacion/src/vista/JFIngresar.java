@@ -1,5 +1,6 @@
 package vista;
 
+import Interfaz.ButtonAdapter;
 import conexion.ConexionBD;
 import conexion.Login;
 import java.awt.Color;
@@ -7,10 +8,7 @@ import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,34 +30,38 @@ public class JFIngresar extends javax.swing.JFrame {
     private Login login;
     private Map<String, Integer> intentosFallidos = new HashMap<>();
 
-    public JFIngresar(){
-    initComponents();
-    setIconImage(new ImageIcon(getClass().getResource("/Iconos/AjustesBest.png")).getImage());
-    this.setLocationRelativeTo(null);
-    setTitle("Login Form");
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public JFIngresar() {
+        initComponents();
+        setIconImage(new ImageIcon(getClass().getResource("/Iconos/AjustesBest.png")).getImage());
+        this.setLocationRelativeTo(null);
+        setTitle("Login Form");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    Font originalFont = olvidasteContra.getFont();
-    Font boldFont = new Font(originalFont.getName(), Font.BOLD, originalFont.getSize());
-    Color originalColor = olvidasteContra.getForeground();
-    Color hoverColor = new Color(0, 0, 255);
+        Font originalFont = olvidasteContra.getFont();
+        Font boldFont = new Font(originalFont.getName(), Font.BOLD, originalFont.getSize());
+        Color originalColor = olvidasteContra.getForeground();
+        ButtonAdapter boton = new ButtonAdapter();
+        Color defaultColor = new Color(255, 250, 243);
+        Color hoverColor = new Color(255, 51, 133);
+        jBIngresar.addMouseListener(boton.createMouseAdapter(jBIngresar, defaultColor, hoverColor));
+        jBMostrarC.addMouseListener(boton.createMouseAdapter(jBMostrarC, defaultColor, hoverColor));
+        
+        olvidasteContra.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                olvidasteContra.setFont(boldFont);
+                olvidasteContra.setForeground(hoverColor);
+            }
 
-    olvidasteContra.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            olvidasteContra.setFont(boldFont);
-            olvidasteContra.setForeground(hoverColor);
-        }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                olvidasteContra.setFont(originalFont);
+                olvidasteContra.setForeground(originalColor);
+            }
+        });
 
-        @Override
-        public void mouseExited(MouseEvent e) {
-            olvidasteContra.setFont(originalFont);
-            olvidasteContra.setForeground(originalColor);
-        }
-    });
-       
-}
-    
+    }
+
     private void mostrarMensajeError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }
@@ -228,14 +230,6 @@ public class JFIngresar extends javax.swing.JFrame {
         jBIngresar.setText("Ingresar");
         jBIngresar.setBorder(null);
         jBIngresar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jBIngresar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jBIngresarMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jBIngresarMouseExited(evt);
-            }
-        });
         jBIngresar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBIngresarActionPerformed(evt);
@@ -251,14 +245,6 @@ public class JFIngresar extends javax.swing.JFrame {
         jBMostrarC.setText("Mostar Contraseña");
         jBMostrarC.setBorder(null);
         jBMostrarC.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jBMostrarC.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jBMostrarCMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jBMostrarCMouseExited(evt);
-            }
-        });
         jBMostrarC.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBMostrarCActionPerformed(evt);
@@ -306,11 +292,11 @@ public class JFIngresar extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBIngresarActionPerformed
-         ConexionBD conexionBD = new ConexionBD(); // Aquí podrías agregar más lógica para manejar el error de conexión.
+        ConexionBD conexionBD = new ConexionBD(); // Aquí podrías agregar más lógica para manejar el error de conexión.
         connection = conexionBD.getConexion();
         login = new Login(connection); // Inicialización correcta
         String username = jTFUser.getText();
-        String password = new String(jTFPassword.getPassword());      
+        String password = new String(jTFPassword.getPassword());
 
         if (username.isEmpty() && password.isEmpty()) {
             mostrarMensajeError("Ingrese un usuario y contraseña");
@@ -402,24 +388,6 @@ public class JFIngresar extends javax.swing.JFrame {
     private void exitTXTMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitTXTMouseExited
         exitP.setBackground(new Color(146, 10, 48));
     }//GEN-LAST:event_exitTXTMouseExited
-
-    private void jBMostrarCMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBMostrarCMouseEntered
-        jBMostrarC.setBackground(new Color(255, 51, 133));
-        //[255,51,133]
-    }//GEN-LAST:event_jBMostrarCMouseEntered
-
-    private void jBMostrarCMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBMostrarCMouseExited
-        // [255,250,243]
-        jBMostrarC.setBackground(new Color(255, 250, 243));
-    }//GEN-LAST:event_jBMostrarCMouseExited
-
-    private void jBIngresarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBIngresarMouseEntered
-        jBIngresar.setBackground(new Color(255, 51, 133));
-    }//GEN-LAST:event_jBIngresarMouseEntered
-
-    private void jBIngresarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBIngresarMouseExited
-        jBIngresar.setBackground(new Color(255, 250, 243));
-    }//GEN-LAST:event_jBIngresarMouseExited
 
     private void jTFPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTFPasswordKeyPressed
         // TODO add your handling code here:
