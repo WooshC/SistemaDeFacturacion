@@ -12,8 +12,8 @@ public class ConexionBD {
     
     private final String HOST = "localhost";
     private final String PUERTO = "5432";
-    private final String DB = "sistemafacturacion";
-    private final String USER = "admin";
+    private final String DB = "sistemafacturacion";//nombre de base de datos
+    private final String USER = "admin";//user
     private final String PASSWORD = "1234";
     
     public Connection getConexion(){
