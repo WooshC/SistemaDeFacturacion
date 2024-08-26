@@ -15,8 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import modUsuarios.Empleado;
-import vista.JFIngresar;
-import vista.JFInventario;
 
 public class JFMenu extends javax.swing.JFrame {
 
